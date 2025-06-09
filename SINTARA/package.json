@@ -1,0 +1,24 @@
+{
+  "name": "sintara-webgis",
+  "version": "1.0.0",
+  "description": "Sistem Informasi Pertanahan Desa Repaking - WebGIS Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve -s . -p 3000",
+    "build": "echo 'Build complete - static files ready'",
+    "start": "serve -s . -p 3000"
+  },
+  "keywords": [
+    "webgis",
+    "pertanahan",
+    "desa",
+    "pemetaan",
+    "gis"
+  ],
+  "author": "SINTARA.id",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

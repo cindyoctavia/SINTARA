@@ -1,0 +1,1679 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SINTARA.id - Sistem Informasi Pertanahan Desa Repaking</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0f4c75;
+      --primary-dark: #0a3d5c;
+      --secondary: #3282b8;
+      --accent: #bbe1fa;
+      --dark: #1b263b;
+      --light: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --info: #0284c7;
+      --header-height: 80px;
+      --sidebar-width: 280px;
+      --footer-height: 400px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Header Styles */
+    .header {
+      height: var(--header-height);
+      background: var(--light);
+      border-bottom: 1px solid var(--gray-200);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: var(--gray-900);
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .brand-info h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+
+    .brand-info p {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin: 0;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-item {
+      color: var(--gray-600);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-item:hover {
+      color: var(--primary);
+      background: var(--gray-100);
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      background: var(--accent);
+      background-opacity: 0.1;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    .btn-outline:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-400);
+    }
+
+    /* Main Layout */
+    .main-layout {
+      display: flex;
+      min-height: 100vh;
+      padding-top: var(--header-height);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--light);
+      border-right: 1px solid var(--gray-200);
+      padding: 2rem 0;
+      position: fixed;
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-section {
+      padding: 0 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .layer-group {
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .layer-group h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .layer-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 0.5rem;
+    }
+
+    .layer-option:hover {
+      background: var(--light);
+    }
+
+    .layer-option.active {
+      background: var(--accent);
+      background-opacity: 0.1;
+      border: 1px solid var(--secondary);
+    }
+
+    .layer-option input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    .layer-option-content {
+      flex: 1;
+    }
+
+    .layer-option-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-800);
+      margin-bottom: 0.25rem;
+    }
+
+    .layer-option-desc {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .legend-section {
+      background: var(--light);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .legend-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-content img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--gray-200);
+    }
+
+    /* Map Container */
+    .map-container {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      position: relative;
+    }
+
+    .map-wrapper {
+      height: calc(100vh - var(--header-height));
+      position: relative;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--light);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .control-btn:hover {
+      background: var(--gray-50);
+      box-shadow: var(--shadow);
+    }
+
+    .info-panel {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      width: 400px;
+      max-height: 60vh;
+      background: var(--light);
+      border-radius: 16px;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      z-index: 1000;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .info-panel.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .info-panel-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+
+    .info-panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-panel-subtitle {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .info-panel-content {
+      padding: 1.5rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.875rem;
+    }
+
+    .info-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .info-table td {
+      color: var(--gray-900);
+    }
+
+    .info-table tr:hover {
+      background: var(--gray-50);
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - var(--header-height) - var(--footer-height));
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+    }
+
+    .welcome-hero {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-text {
+      color: white;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .hero-location {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    .hero-features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .feature-content h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-content p {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .login-card {
+      background: var(--light);
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      backdrop-filter: blur(20px);
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .login-subtitle {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      transition: var(--transition);
+      background: var(--light);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.1);
+    }
+
+    .login-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn-login {
+      justify-content: center;
+      padding: 0.875rem 1.5rem;
+      font-weight: 600;
+    }
+
+    .btn-guest {
+      justify-content: center;
+      background: transparent;
+      color: var(--gray-600);
+      border: 1px solid var(--gray-300);
+    }
+
+    .btn-guest:hover {
+      background: var(--gray-50);
+      color: var(--gray-800);
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: var(--dark);
+      color: var(--light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="footerGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23footerGrid)"/></svg>');
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.75rem;
+    }
+
+    .footer-logo-text h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .footer-logo-text p {
+      font-size: 0.875rem;
+      color: var(--gray-400);
+    }
+
+    .footer-description {
+      color: var(--gray-300);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--light);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .social-link:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .footer-section h4 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+      padding-left: 0.5rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      color: var(--gray-300);
+    }
+
+    .contact-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      margin-top: 0.125rem;
+      flex-shrink: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .stat-item {
+      background: rgba(255,255,255,0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--gray-400);
+      margin-top: 0.25rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copyright {
+      color: var(--gray-400);
+      font-size: 0.875rem;
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .footer-legal a {
+      color: var(--gray-400);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .footer-legal a:hover {
+      color: var(--accent);
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: var(--gray-800);
+      color: var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      font-size: 0.75rem;
+      z-index: 1000;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Loading States */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: var(--transition);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .map-container {
+        margin-left: 0;
+      }
+
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .info-panel {
+        width: calc(100% - 2rem);
+        margin: 0 1rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0 1rem;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      .hero-features {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    .visible { display: block !important; }
+    .flex { display: flex !important; }
+    .text-center { text-align: center !important; }
+    .text-primary { color: var(--primary) !important; }
+    .bg-primary { background: var(--primary) !important; }
+    .rounded { border-radius: 8px !important; }
+    .shadow { box-shadow: var(--shadow) !important; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <a href="#" class="header-brand">
+    <div class="brand-logo">
+      <i class="fas fa-map-marked-alt"></i>
+    </div>
+    <div class="brand-info">
+      <h1>SINTARA.id</h1>
+      <p>Sistem Informasi Pertanahan Desa Repaking</p>
+    </div>
+  </a>
+  
+  <nav class="header-nav">
+    <a href="#" class="nav-item active">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-map"></i> Peta Interaktif
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fas fa-chart-bar"></i> Data & Statistik
+    </a>
+    <a href="#" class="nav-item" onclick="scrollToFooter()">
+      <i class="fas fa-info-circle"></i> Tentang
+    </a>
+  </nav>
+  
+  <div class="user-menu">
+    <button class="btn btn-outline" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <button class="btn btn-primary" onclick="showLoginModal()">
+      <i class="fas fa-sign-in-alt"></i> Masuk
+    </button>
+  </div>
+</header>
+
+<!-- Welcome Screen -->
+<div class="welcome-screen" id="welcomeScreen">
+  <div class="welcome-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Sistem Informasi Pertanahan Desa Repaking</h1>
+        <p class="hero-subtitle">Platform WebGIS Modern untuk Transparansi Data Pertanahan</p>
+        <div class="hero-location">
+          <i class="fas fa-map-marker-alt"></i>
+          Kecamatan Wonosamodro, Kabupaten Boyolali
+        </div>
+        <p class="hero-description">
+          Platform WebGIS yang menyajikan data spasial pertanahan secara digital dan interaktif untuk mendukung transparansi, akurasi, dan kemudahan akses informasi pertanahan.
+        </p>
+        
+        <div class="hero-features">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-border-all"></i>
+            </div>
+            <div class="feature-content">
+              <h4>Batas Administratif</h4>
+              <p>Visualisasi batas wilayah desa</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-home"></i>
+            </div>
+            <div class="feature-content">
+              <h4>Bidang Tanah</h4>
+              <p>Informasi kepemilikan lahan</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-road"></i>
+            </div>
+            <div class="feature-content">
+              <h4>Infrastruktur</h4>
+              <p>Jaringan jalan dan fasilitas</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <div class="feature-content">
+              <h4>Penggunaan Lahan</h4>
+              <p>Klasifikasi pemanfaatan lahan</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-login" onclick="showMapInterface()">
+            <i class="fas fa-eye"></i> Lihat Peta
+          </button>
+          <button class="btn btn-outline" onclick="showLoginModal()">
+            <i class="fas fa-sign-in-alt"></i> Login Admin
+          </button>
+        </div>
+      </div>
+      
+      <div class="login-card">
+        <h2 class="login-title">Akses Cepat</h2>
+        <p class="login-subtitle">Masuk untuk akses penuh atau lanjutkan sebagai tamu</p>
+        
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-input" id="username" placeholder="Masukkan username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="password" placeholder="Masukkan password">
+          </div>
+          <div class="login-actions">
+            <button type="submit" class="btn btn-primary btn-login">
+              <i class="fas fa-sign-in-alt"></i>
+              Masuk ke Sistem
+              <div class="loading-spinner" id="loginLoading" style="display: none;"></div>
+            </button>
+            <button type="button" class="btn btn-guest" onclick="showMapInterface()">
+              <i class="fas fa-eye"></i> Akses sebagai Tamu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-layout hidden" id="mainLayout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">
+        <i class="fas fa-layer-group"></i> Layer Peta
+      </div>
+      
+      <div class="layer-group">
+        <h3>
+          <i class="fas fa-map"></i> Layer Dasar
+        </h3>
+        <form id="layerForm">
+          <div class="layer-option">
+            <input type="radio" name="layer" value="batasdesa" id="layer-batasdesa">
+            <div class="layer-option-content">
+              <div class="layer-option-title">Batas Desa</div>
+              <div class="layer-option-desc">Batas administratif wilayah desa</div>
+            </div>
+          </div>
+          <div class="layer-option">
+            <input type="radio" name="layer" value="bidangdesa" id="layer-bidangdesa">
+            <div class="layer-option-content">
+              <div class="layer-option-title">Bidang Tanah</div>
+              <div class="layer-option-desc">Informasi kepemilikan tanah</div>
+            </div>
+          </div>
+          <div class="layer-option">
+            <input type="radio" name="layer" value="jalandesa" id="layer-jalandesa">
+            <div class="layer-option-content">
+              <div class="layer-option-title">Jalan Desa</div>
+              <div class="layer-option-desc">Jaringan infrastruktur jalan</div>
+            </div>
+          </div>
+          <div class="layer-option">
+            <input type="radio" name="layer" value="pldesa" id="layer-pldesa">
+            <div class="layer-option-content">
+              <div class="layer-option-title">Penggunaan Lahan</div>
+              <div class="layer-option-desc">Klasifikasi pemanfaatan lahan</div>
+            </div>
+          </div>
+          <div class="layer-option">
+            <input type="radio" name="layer" value="sungaidesa" id="layer-sungaidesa">
+            <div class="layer-option-content">
+              <div class="layer-option-title">Sungai Desa</div>
+              <div class="layer-option-desc">Sistem hidrologi desa</div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="sidebar-section">
+      <div class="legend-section">
+        <h3 class="legend-title">
+          <i class="fas fa-palette"></i> Legenda
+        </h3>
+        <div class="legend-content" id="legendContent">
+          <p style="text-align: center; color: var(--gray-500);">
+            <i class="fas fa-info-circle"></i>
+            Pilih layer untuk melihat legenda
+          </p>
+        </div>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- Map Container -->
+  <main class="map-container">
+    <div class="map-wrapper">
+      <div id="map"></div>
+      
+      <div class="map-controls">
+        <button class="control-btn" onclick="toggleFullscreen()" title="Layar Penuh">
+          <i class="fas fa-expand"></i>
+        </button>
+        <button class="control-btn" onclick="resetMapView()" title="Reset View">
+          <i class="fas fa-home"></i>
+        </button>
+        <button class="control-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="info-panel" id="infoPanel">
+        <div class="info-panel-header">
+          <h3 class="info-panel-title">
+            <i class="fas fa-info-circle"></i>
+            Informasi Fitur
+          </h3>
+          <p class="info-panel-subtitle">Detail atribut yang dipilih</p>
+        </div>
+        <div class="info-panel-content" id="infoPanelContent">
+          <p style="text-align: center; color: var(--gray-500);">
+            Klik pada peta untuk melihat informasi detail
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="footer" id="footer">
+  <div class="footer-content">
+    <div class="footer-grid">
+      <!-- Brand Section -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <div class="footer-logo-text">
+            <h3>SINTARA.id</h3>
+            <p>Sistem Informasi Pertanahan</p>
+          </div>
+        </div>
+        <p class="footer-description">
+          Platform WebGIS yang menyajikan data spasial pertanahan secara digital dan interaktif untuk Desa Repaking. Mendukung transparansi, akurasi, dan kemudahan akses informasi pertanahan bagi masyarakat dan pemerintah desa.
+        </p>
+        <div class="footer-social">
+          <a href="#" class="social-link" title="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-link" title="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="social-link" title="Twitter">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link" title="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-section">
+        <h4>
+          <i class="fas fa-link"></i> Tautan Cepat
+        </h4>
+        <ul class="footer-links">
+          <li><a href="#" onclick="showMapInterface()"><i class="fas fa-map"></i> Peta Interaktif</a></li>
+          <li><a href="#"><i class="fas fa-download"></i> Download Data</a></li>
+          <li><a href="#"><i class="fas fa-chart-bar"></i> Statistik</a></li>
+          <li><a href="#"><i class="fas fa-book"></i> Panduan</a></li>
+          <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+          <li><a href="#"><i class="fas fa-headset"></i> Support</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="footer-section">
+        <h4>
+          <i class="fas fa-phone"></i> Kontak Kami
+        </h4>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div>
+            <strong>Alamat:</strong><br>
+            Desa Repaking, Kec. Wonosamodro<br>
+            Kabupaten Boyolali, Jawa Tengah
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div>
+            <strong>Telepon:</strong><br>
+            +62 271 123456
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <strong>Email:</strong><br>
+            info@sintara.id
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div>
+            <strong>Jam Layanan:</strong><br>
+            Senin - Jumat: 08:00 - 16:00 WIB
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="footer-section">
+        <h4>
+          <i class="fas fa-chart-line"></i> Statistik
+        </h4>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number" id="statBidang">1,245</span>
+            <span class="stat-label">Bidang Tanah</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statLuas">850</span>
+            <span class="stat-label">Ha Total Luas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statKepala">3,678</span>
+            <span class="stat-label">Kepala Keluarga</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="statUpdate">24/7</span>
+            <span class="stat-label">Data Update</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copyright">
+        <i class="fas fa-copyright"></i> 2024 SINTARA.id - Desa Repaking. All rights reserved.
+      </div>
+      <div class="footer-legal">
+        <a href="#">Kebijakan Privasi</a>
+        <a href="#">Syarat & Ketentuan</a>
+        <a href="#">Disclaimer</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Status Bar -->
+<div class="status-bar" id="statusBar" style="display: none;">
+  <div class="status-left">
+    <div class="status-item">
+      <i class="fas fa-map"></i>
+      <span id="currentLayer">Pilih Layer</span>
+    </div>
+    <div class="status-item">
+      <i class="fas fa-mouse-pointer"></i>
+      <span id="mouseCoords">-</span>
+    </div>
+  </div>
+  <div class="status-right">
+    <div class="status-item">
+      <i class="fas fa-server"></i>
+      <span>Status: <span id="serverStatus">Terhubung</span></span>
+    </div>
+    <div class="status-item">
+      <i class="fas fa-copyright"></i>
+      <span>2024 SINTARA.id</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variables
+  let map = null;
+  let activeLayer = null;
+  let sidebarOpen = true;
+
+  // Configuration
+  const config = {
+    geoServerUrl: 'http://localhost:8080/geoserver/SIP_DesaRepaking',
+    mapCenter: [-7.229837, 110.626618],
+    mapZoom: 15,
+    layers: {
+      batasdesa: {
+        title: "Batas Desa",
+        layerName: "SIP_DesaRepaking:batasdesa",
+        description: "Batas administratif wilayah desa",
+        icon: "fas fa-border-all"
+      },
+      bidangdesa: {
+        title: "Bidang Tanah",
+        layerName: "SIP_DesaRepaking:bidangdesa",
+        description: "Informasi kepemilikan tanah",
+        icon: "fas fa-home"
+      },
+      jalandesa: {
+        title: "Jalan Desa",
+        layerName: "SIP_DesaRepaking:jalandesa",
+        description: "Jaringan infrastruktur jalan",
+        icon: "fas fa-road"
+      },
+      pldesa: {
+        title: "Penggunaan Lahan",
+        layerName: "SIP_DesaRepaking:pldesa",
+        description: "Klasifikasi pemanfaatan lahan",
+        icon: "fas fa-seedling"
+      },
+      sungaidesa: {
+        title: "Sungai Desa",
+        layerName: "SIP_DesaRepaking:sungaidesa",
+        description: "Sistem hidrologi desa",
+        icon: "fas fa-water"
+      }
+    }
+  };
+
+  // Initialize application
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeEventListeners();
+    animateStatistics();
+  });
+
+  function initializeEventListeners() {
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    
+    // Layer selection
+    document.getElementById('layerForm').addEventListener('change', handleLayerChange);
+    
+    // Layer options styling
+    document.querySelectorAll('.layer-option').forEach(option => {
+      option.addEventListener('click', function() {
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+        handleLayerChange({ target: radio });
+      });
+    });
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const loginBtn = document.querySelector('.btn-login');
+    const loading = document.getElementById('loginLoading');
+    
+    if (!username || !password) {
+      alert('Mohon lengkapi username dan password!');
+      return;
+    }
+    
+    loginBtn.disabled = true;
+    loading.style.display = 'inline-block';
+    
+    // Simulate login
+    setTimeout(() => {
+      loginBtn.disabled = false;
+      loading.style.display = 'none';
+      showMapInterface();
+    }, 1500);
+  }
+
+  function showMapInterface() {
+    document.getElementById('welcomeScreen').classList.add('hidden');
+    document.getElementById('mainLayout').classList.remove('hidden');
+    document.getElementById('statusBar').style.display = 'flex';
+    
+    // Initialize map after interface is shown
+    setTimeout(() => {
+      initializeMap();
+    }, 100);
+  }
+
+  function initializeMap() {
+    if (map) return;
+
+    // Create map
+    map = L.map('map').setView(config.mapCenter, config.mapZoom);
+
+    // Add base layer
+    L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      attribution: '&copy; Google Maps',
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    }).addTo(map);
+
+    // Map events
+    map.on('click', handleMapClick);
+    map.on('mousemove', updateMouseCoordinates);
+
+    // Load default layer
+    loadLayer('batasdesa');
+    document.getElementById('layer-batasdesa').checked = true;
+    updateLayerSelection('batasdesa');
+  }
+
+  function handleLayerChange(e) {
+    if (e.target.name === 'layer') {
+      loadLayer(e.target.value);
+      updateLayerSelection(e.target.value);
+    }
+  }
+
+  function loadLayer(layerKey) {
+    const layerInfo = config.layers[layerKey];
+    if (!layerInfo) return;
+
+    // Remove existing layer
+    if (activeLayer) {
+      map.removeLayer(activeLayer);
+    }
+
+    // Add new WMS layer
+    activeLayer = L.tileLayer.wms(config.geoServerUrl + '/wms', {
+      layers: layerInfo.layerName,
+      format: 'image/png',
+      transparent: true,
+      attribution: 'SINTARA.id'
+    }).addTo(map);
+
+    // Update legend
+    updateLegend(layerInfo.layerName);
+    
+    // Update status
+    document.getElementById('currentLayer').textContent = layerInfo.title;
+
+    // Load WFS for interaction
+    loadWFSLayer(layerInfo);
+  }
+
+  function loadWFSLayer(layerInfo) {
+    const wfsUrl = `${config.geoServerUrl}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${layerInfo.layerName}&outputFormat=application/json`;
+    
+    fetch(wfsUrl)
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: {
+            color: '#0f4c75',
+            weight: 2,
+            fillOpacity: 0.1,
+            opacity: 0.7
+          },
+          onEachFeature: function(feature, layer) {
+            layer.on('click', function() {
+              showFeatureInfo(feature.properties, layerInfo.title);
+            });
+          }
+        }).addTo(map);
+      })
+      .catch(error => {
+        console.warn('WFS data tidak dapat dimuat:', error);
+      });
+  }
+
+  function handleMapClick(e) {
+    if (!activeLayer) return;
+
+    const layerName = activeLayer.wmsParams.layers;
+    const point = map.latLngToContainerPoint(e.latlng);
+    const size = map.getSize();
+    const bounds = map.getBounds();
+    const bbox = `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
+
+    $.ajax({
+      url: config.geoServerUrl + '/wms',
+      data: {
+        service: "WMS",
+        version: "1.1.1",
+        request: "GetFeatureInfo",
+        layers: layerName,
+        query_layers: layerName,
+        info_format: "application/json",
+        feature_count: 5,
+        srs: "EPSG:4326",
+        bbox: bbox,
+        width: size.x,
+        height: size.y,
+        x: Math.round(point.x),
+        y: Math.round(point.y)
+      },
+      success: function(result) {
+        if (result && result.features && result.features.length > 0) {
+          const layerInfo = Object.values(config.layers).find(l => l.layerName === layerName);
+          showFeatureInfo(result.features[0].properties, layerInfo?.title || 'Layer');
+        } else {
+          hideFeatureInfo();
+        }
+      },
+      error: function() {
+        console.error('Gagal mengambil informasi fitur');
+      }
+    });
+  }
+
+  function showFeatureInfo(properties, layerTitle) {
+    const panel = document.getElementById('infoPanel');
+    const content = document.getElementById('infoPanelContent');
+    
+    let html = `<table class="info-table">`;
+    for (const [key, value] of Object.entries(properties)) {
+      html += `
+        <tr>
+          <th>${key}</th>
+          <td>${value || '-'}</td>
+        </tr>
+      `;
+    }
+    html += `</table>`;
+    
+    content.innerHTML = html;
+    panel.classList.add('active');
+  }
+
+  function hideFeatureInfo() {
+    document.getElementById('infoPanel').classList.remove('active');
+  }
+
+  function updateLegend(layerName) {
+    const legendUrl = `${config.geoServerUrl}/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=${layerName}`;
+    document.getElementById('legendContent').innerHTML = `<img src="${legendUrl}" alt="Legend" onerror="this.style.display='none'">`;
+  }
+
+  function updateLayerSelection(layerKey) {
+    document.querySelectorAll('.layer-option').forEach(option => {
+      option.classList.remove('active');
+    });
+    
+    const selectedOption = document.querySelector(`#layer-${layerKey}`).closest('.layer-option');
+    selectedOption.classList.add('active');
+  }
+
+  function updateMouseCoordinates(e) {
+    const coords = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+    document.getElementById('mouseCoords').textContent = coords;
+  }
+
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebarOpen = !sidebarOpen;
+    
+    if (sidebarOpen) {
+      sidebar.classList.remove('active');
+    } else {
+      sidebar.classList.add('active');
+    }
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  function resetMapView() {
+    if (map) {
+      map.setView(config.mapCenter, config.mapZoom);
+    }
+  }
+
+  function showLoginModal() {
+    // Implementation for login modal
+    console.log('Show login modal');
+  }
+
+  function scrollToFooter() {
+    document.getElementById('footer').scrollIntoView({ 
+      behavior: 'smooth' 
+    });
+  }
+
+  function animateStatistics() {
+    // Animate counter numbers
+    const stats = [
+      { id: 'statBidang', target: 1245, suffix: '' },
+      { id: 'statLuas', target: 850, suffix: '' },
+      { id: 'statKepala', target: 3678, suffix: '' }
+    ];
+
+    stats.forEach(stat => {
+      animateCounter(stat.id, stat.target, stat.suffix);
+    });
+  }
+
+  function animateCounter(elementId, target, suffix) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    let current = 0;
+    const increment = target / 50;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        current = target;
+        clearInterval(timer);
+      }
+      element.textContent = Math.floor(current).toLocaleString() + suffix;
+    }, 50);
+  }
+</script>
+
+</body>
+</html>
